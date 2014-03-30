@@ -7,17 +7,20 @@ import argparse
 import re
 parser = argparse.ArgumentParser(description='Basic Regular Expressions Tester')
 parser.add_argument('regexp', help='The regular expression pattern', metavar='RegExp')
-parser.add_argument('text', help='Text to be matched using the RegExp', metavar='Text')
+tig = parser.add_mutually_exclusive_group(True)
+tig.add_argument('-i', '--input', default=sys.stdin, type=argparse.FileType('r'), help='Get the text from a file', metavar='File')
+tig.add_argument('-t', '--text', help='Text to be matched using the RegExp', metavar='Text')
 parser.add_argument('-r', '--replace', help='Replace matched text', metavar='Replacement')
-eg = parser.add_mutually_exclusive_group()
-eg.add_argument('-a', '--all', action='store_true', help='Return all matches')
-eg.add_argument('-l', '--limit', type=int, default='1', metavar='Limit')
+alg = parser.add_mutually_exclusive_group()
+alg.add_argument('-a', '--all', action='store_true', help='Return all matches')
+alg.add_argument('-l', '--limit', type=int, default='1', metavar='Limit')
 parser.add_argument('-s', '--start', type=int, default='0', help='Set the starting position in the text', metavar='Position')
 parser.add_argument('-e', '--end', type=int, help='Set the ending position in the text', metavar='Position')
 parser.add_argument('-q', '--quite', action='store_true', help='Return the results only')
 parser.add_argument('-o', '--output', type=argparse.FileType('w'), default=sys.stdout, help='Write the results in a file', metavar='File')
 parser.add_argument('-p', '--suppress-errors', action='store_true', help='Don\'t show error messages')
 args = parser.parse_args()
+if args.input: args.text = args.input.read(); args.input.close() # Send the file content to args.text variable in order to use it in the program.
 n = len(args.text)
 if not args.end or args.end > n: args.end = n # Set the default value of --end option on the last position.
 if args.text[args.start:args.end]=='': args.start = args.end # Starting position mustn't be greater than the end.
