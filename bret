@@ -25,8 +25,8 @@ parser = argparse.ArgumentParser(description='Basic Regular Expressions Tester')
 parser.add_argument('regexp', help='The regular expression pattern', metavar='RegExp')
 tig = parser.add_mutually_exclusive_group(required=True)
 tig.add_argument('-t', '--text', help='Text to be matched using the RegExp', metavar='Text')
-tig.add_argument('-i', '--input', default=sys.stdin, type=argparse.FileType('r'), help='Get the text from a file', metavar='File')
-parser.add_argument('-o', '--output', type=argparse.FileType('w'), default=sys.stdout, help='Write the results in a file', metavar='File')
+tig.add_argument('-i', '--input', help='Get the text from a file', metavar='File')
+parser.add_argument('-o', '--output', help='Write the results in a file', metavar='File')
 parser.add_argument('-r', '--replace', help='Replace matched text', metavar='Replacement')
 alg = parser.add_mutually_exclusive_group()
 alg.add_argument('-a', '--all', action='store_true', help='Return all matches')
@@ -36,7 +36,20 @@ parser.add_argument('-e', '--end', type=int, help='Set the ending position in th
 parser.add_argument('-q', '--quite', action='store_true', help='Return the results only')
 parser.add_argument('-p', '--suppress-errors', action='store_true', help='Don\'t show error messages')
 args = parser.parse_args()
-if not args.text: args.text = args.input.read(); args.input.close() # Send the file content to args.text variable in order to use it in the program.
+if not args.text:
+	try:
+		args.input = open(args.input,'r')
+	except OSError as e:
+		print('ERROR : Couldn\'t read' , e.filename, ':', e.strerror)
+		sys.exit(3) # (3) exit status is reserved for file errors.
+	args.text = args.input.read(); args.input.close() # Send the file content to args.text variable in order to use it in the program.
+if args.output:
+	try:
+		args.output = open(args.output,'w')
+	except OSError as e:
+		print('ERROR : Couldn\'t write' , e.filename, ':', e.strerror)
+		sys.exit(3)
+else: args.output = sys.stdout
 n = len(args.text)
 if not args.end or args.end > n: args.end = n # Set the default value of --end option on the last position.
 if args.text[args.start:args.end]=='': args.start = args.end # Starting position mustn't be greater than the end.
@@ -66,11 +79,11 @@ if args.all:
 	  print('- ' if not args.quite else '', x.group(), sep='', file=args.output)
 	if not n :
 		if not args.quite: print(NO_MATCH, file=sys.stderr)
-		sys.exit(3) 
+		sys.exit(4) 
 	sys.exit(0)
 	if not n: # if there is no matches.
 		if not args.quite: print(NO_MATCH, file=stderr)
-		sys.exit(3) # (3) exit status is reserved for 'No match' warnings.
+		sys.exit(4) # (4) exit status is reserved for 'No match' warnings.
 else:
 	matches = [] # List of 'match' objects.
 	start = args.start
@@ -83,4 +96,4 @@ else:
 		print('- ' if not args.quite else '', match.group(), sep='', file=args.output)
 	if not n:
 		if not args.quite: print(NO_MATCH, file=sys.stderr)
-		sys.exit(3)
+		sys.exit(4)
