@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 #
+#    Basic Regular Expressions Tester (BRET)
 #    Copyright 2014 Hamza Abbad
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -31,70 +32,79 @@ parser.add_argument('-r', '--replace', help='Replace matched text', metavar='Rep
 alg = parser.add_mutually_exclusive_group()
 alg.add_argument('-a', '--all', action='store_true', help='Return all matches')
 alg.add_argument('-l', '--limit', type=int, default='1', metavar='Limit')
+alg.add_argument('-x', '--exact-match', action='store_true', help='Check if the pattern match the string completely')
 parser.add_argument('-s', '--start', type=int, default='0', help='Set the starting position in the text', metavar='Position')
 parser.add_argument('-e', '--end', type=int, help='Set the ending position in the text', metavar='Position')
 parser.add_argument('-p', '--positions', action='store_true', help='Return the start and the end positions of the matches')
 parser.add_argument('-q', '--quite', action='store_true', help='Return the results only')
 parser.add_argument('-u', '--suppress-errors', action='store_true', help='Don\'t show error messages')
 args = parser.parse_args()
-if not args.text:
+if not args.text :
 	try:
 		args.input = open(args.input,'r')
 	except OSError as e:
-		print('ERROR : Couldn\'t read' , e.filename, ':', e.strerror)
+		print('ERROR : Couldn\'t read' , e.filename, ':', e.strerror, file=sys.stderr)
 		sys.exit(3) # (3) exit status is reserved for file errors.
 	args.text = args.input.read(); args.input.close() # Send the file content to args.text variable in order to use it in the program.
-if args.output:
+if args.output :
 	try:
 		args.output = open(args.output,'w')
 	except OSError as e:
-		print('ERROR : Couldn\'t write' , e.filename, ':', e.strerror)
+		print('ERROR : Couldn\'t write' , e.filename, ':', e.strerror, file=sys.stderr)
 		sys.exit(3)
 else: args.output = sys.stdout
 n = len(args.text)
-if not args.end or args.end > n: args.end = n # Set the default value of --end option on the last position.
+if not args.end or args.end > n : args.end = n # Set the default value of --end option on the last position.
 if args.text[args.start:args.end]=='': args.start = args.end # Starting position mustn't be greater than the end.
 try:
 	rx = re.compile(args.regexp) # Create the RegExp and check if it is valid.
 except re.error as e:
-	if not args.suppress_errors: print('ERROR : invalid RegExp:', e.args[0], file=sys.stderr) # Print the error and exit with a non zero status.
+	if not args.suppress_errors: print('ERROR : invalid RegExp :', e.args[0], file=sys.stderr) # Print the error and exit with a non zero status.
 	sys.exit(2); # (2) exit status is reserved for RegExp errors.
 if not args.quite and not args.output: print('') # Just an empty line before the main output.
 # Replacement part:
 if args.replace:
-	if not args.all:
+	if not args.all :
 		text, n = rx.subn(args.replace, args.text[args.start:args.end],args.limit)
 	else:
 		text, n = rx.subn(args.replace, args.text[args.start:args.end])
 	text = args.text[:args.start]+text+args.text[args.end:] # Beginning + selected text + the end.
-	if not args.quite: print(n,'replacement'+('s' if n>1 else ''), 'made:', file=args.output)
+	if not args.quite : print(n,'replacement'+('s' if n>1 else ''), 'made :', file=args.output)
 	print(text, file=args.output)
 	sys.exit(0)
 # Searching part:
-NO_MATCH = 'WARNING : No match found' # Message to be displayed when no matches are found and --quite option is not specified.
-if args.all:
+MATCH = 'Matched !' # Message to be displayed when the regular expression match the string and --exact-match option is specified but not --quite.
+NO_MATCH = 'No match found !' # Message to be displayed when no matches are found and --quite option is not specified.
+if args.all : # "All" option
 	matches = list(rx.finditer(args.text, args.start, args.end)) # Create a list from an iterator of 'match' objects.
 	n = len(matches) # Number of matches found.
-	if not args.quite and n>0: print(n,'match'+('es' if n>1 else ''), 'found:', file=args.output) # Write 'matches' if n > 1.
-	for x in matches:
-	  print('- ' if not args.quite else '', x.group(), ((((' : match from ' if not args.quite else '(') + str(x.start()) + (' to ' if not args.quite else ',') + str(x.end())) if args.positions else '') + (')' if args.quite else '')), sep='', file=args.output)
+	if not args.quite and n>0: print(n,'match'+('es' if n>1 else ''), 'found :', file=args.output) # Write 'matches' if n > 1.
+	for x in matches :
+	  print('- ' if not args.quite else '', x.group(), ((((' : match from ' if not args.quite else '(') + str(x.start()) + (' to ' if not args.quite else ',') + str(x.end()) + (')' if args.quite else '')) if args.positions else '')), sep='', file=args.output)
 	if not n :
 		if not args.quite: print(NO_MATCH, file=sys.stderr)
 		sys.exit(4) 
 	sys.exit(0)
-	if not n: # if there is no matches.
-		if not args.quite: print(NO_MATCH, file=stderr)
+	if not n : # if there is no matches.
+		if not args.quite: print(NO_MATCH, file=sys.stderr)
 		sys.exit(4) # (4) exit status is reserved for 'No match' warnings.
-else:
+elif args.exact_match : # "Exact match" option
+	match = rx.match(args.text)
+	if match and match.group() == args.text :
+	    if not args.quite : print(MATCH, file=sys.stderr)
+	else :
+	  if not args.quite : print(NO_MATCH, file=sys.stderr)
+	  sys.exit(4)
+elif args.limit : # "Limit" option
 	matches = [] # List of 'match' objects.
 	start = args.start
 	for i in range(args.limit): # Number of iterations = the limit of results requested.
 		match = rx.search(args.text, start, args.end)
 		if match : matches.append(match); start = match.end()
 	n = len(matches)
-	if not args.quite and n>0: print(n,'match'+('es' if n>1 else ''), 'found:', file=args.output) 
-	for match in matches:
-		print('- ' if not args.quite else '', match.group(), ((((' : match from ' if not args.quite else '(') + str(x.start()) + (' to ' if not args.quite else ',') + str(x.end())) if args.positions else '') + (')' if args.quite else '')), sep='', file=args.output)
+	if not args.quite and n>0: print(n,'match'+('es' if n>1 else ''), 'found :', file=args.output) 
+	for x in matches :
+		print('- ' if not args.quite else '', x.group(), ((((' : match from ' if not args.quite else '(') + str(x.start()) + (' to ' if not args.quite else ',') + str(x.end()) + (')' if args.quite else '')) if args.positions else '')), sep='', file=args.output)
 	if not n:
 		if not args.quite: print(NO_MATCH, file=sys.stderr)
 		sys.exit(4)
