@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# -*- coding: utf-8 -*-
 #
 #    Basic Regular Expressions Tester (BRET)
 #    Copyright 2014 Hamza Abbad
