@@ -43,7 +43,11 @@ def search(regexp, text, limit, start, end):
 		for i in range(limit): # Number of iterations = the limit of results requested.
 			match = regexp.search(text, start, end)
 			if match : matches.append(match); start = match.end()
+			else : break
 	return matches
+# Splitting function :
+def split(regexp, text, limit, start, end):
+	return regexp.split(text[:start]+text[start:end]+text[end:], limit)
 # If the script is running from the command line :
 if __name__  == '__main__' :
 	import sys
@@ -69,20 +73,21 @@ if __name__  == '__main__' :
 	parser.add_argument('-q', '--quite', action='store_true', help='Return the results only')
 	parser.add_argument('-u', '--suppress-errors', action='store_true', help='Don\'t show error messages')
 	parser.add_argument('-g', '--groups', action='store_true', help='Show matched groups also')
+	parser.add_argument('-z', '--split', action='store_true', help='Split the text using a regular expression')
 	args = parser.parse_args()
 	if args.input :
 		try:
 			args.input = open(args.input, 'r', encoding="utf-8")
 			args.text = args.input.read()
 		except OSError as e:
-			print('ERROR : Couldn\'t read' , e.filename, ':', e.strerror, file=sys.stderr)
+			if not args.suppress_errors : print('ERROR : Couldn\'t read' , e.filename, ':', e.strerror, file=sys.stderr)
 			sys.exit(3) # (3) exit status is reserved for file errors.
 		args.input.close() # Send the file content to args.text variable in order to use it in the program.
 	if args.output :
 		try:
 			args.output = open(args.output,'w', encoding="utf-8")
 		except OSError as e:
-			print('ERROR : Couldn\'t write' , e.filename, ':', e.strerror, file=sys.stderr)
+			if not args.suppress_errors : print('ERROR : Couldn\'t write' , e.filename, ':', e.strerror, file=sys.stderr)
 			sys.exit(3)
 	else: args.output = sys.stdout
 	n = len(args.text)
@@ -91,7 +96,7 @@ if __name__  == '__main__' :
 	try:
 		rx = re.compile(args.regexp) # Create the RegExp and check if it is valid.
 	except re.error as e:
-		if not args.suppress_errors: print('ERROR : invalid RegExp :', e.args[0], file=sys.stderr) # Print the error and exit with a non zero status.
+		if not args.suppress_errors : print('ERROR : invalid RegExp :', e.args[0], file=sys.stderr) # Print the error and exit with a non zero status.
 		sys.exit(2); # (2) exit status is reserved for RegExp errors.
 	if not args.quite and not args.output: print('') # Just an empty line before the main output.
 	if args.all : args.limit = 0 # Set the limit to 0 (without limit) if 'all' option is specified.
@@ -102,6 +107,13 @@ if __name__  == '__main__' :
 		if not args.quite : print(n,'replacement'+('s' if n>1 else ''), 'made :', file=args.output)
 		print(text, file=args.output)
 		sys.exit(0)
+	elif  args.split : # Split option.
+		textParts = split(rx ,args.text, args.limit, args.start, args.end)
+		n = len(textParts)-1
+		if not args.quite :
+			print(n, 'split'+('s' if n>1 else ''), 'made :', file=args.output)
+		for part in textParts :
+			print('-' if not args.quite else '', part, sep='', file=args.output)
 	elif not args.exact_match : # Search option.
 		matches = search(rx, args.text, args.limit, args.start, args.end)
 		n = len(matches) # Number of matches found.
