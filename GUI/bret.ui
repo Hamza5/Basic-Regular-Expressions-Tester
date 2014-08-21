@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>594</width>
-    <height>472</height>
+    <height>561</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,9 +24,9 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Regular expresion and text</string>
+      <string>Regular expresion and options</string>
      </property>
-     <layout class="QFormLayout" name="formLayout_2">
+     <layout class="QFormLayout" name="formLayout">
       <property name="fieldGrowthPolicy">
        <enum>QFormLayout::ExpandingFieldsGrow</enum>
       </property>
@@ -41,7 +41,25 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="RegExpLineEdit"/>
+       <layout class="QHBoxLayout" name="RegExpLayout">
+        <item>
+         <widget class="QLineEdit" name="RegExpLineEdit">
+          <property name="whatsThis">
+           <string>Type here the regular expression in Python syntax</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="ResetRegExpPushButton">
+          <property name="text">
+           <string>Reset</string>
+          </property>
+          <property name="icon">
+           <iconset theme="edit-clear"/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="RegExpOptionsLabel">
@@ -54,6 +72,9 @@
        <layout class="QHBoxLayout" name="RegExpOptionsLayout">
         <item>
          <widget class="QPushButton" name="IgnoreCasePushButton">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do not distinguish between lowercase and uppercase letters.&lt;/p&gt;&lt;p&gt;For example : the pattern [A-Z] will match lowercase letters too.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Ignore case</string>
           </property>
@@ -64,6 +85,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="MultiLinePushButton">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make the pattern character &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;'^'&lt;/span&gt; matches at the beginning of the string and at the beginning of each line, and the pattern character &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;'$'&lt;/span&gt; matches at the end of the string and at the end of each line.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Multiline m&amp;ode</string>
           </property>
@@ -74,6 +98,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="DotAllPushButton">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make the &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;'.'&lt;/span&gt; special character match any character at all, including a newline.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Dot matches all</string>
           </property>
@@ -84,6 +111,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="ASCIIOnlyPushButton">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\w&lt;/span&gt;, &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\W&lt;/span&gt;, &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\b&lt;/span&gt;, &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\B&lt;/span&gt;, &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\d&lt;/span&gt;, &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\D&lt;/span&gt;, &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\s&lt;/span&gt; and &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\S&lt;/span&gt; perform ASCII-only matching instead of full Unicode matching.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;ASCII only</string>
           </property>
@@ -99,10 +129,22 @@
    </item>
    <item>
     <widget class="QTabWidget" name="MethodTabWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="tabPosition">
       <enum>QTabWidget::South</enum>
      </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
      <widget class="QWidget" name="TextTab">
+      <attribute name="icon">
+       <iconset theme="text-field"/>
+      </attribute>
       <attribute name="title">
        <string>Input te&amp;xt</string>
       </attribute>
@@ -110,7 +152,7 @@
        <item>
         <widget class="QPlainTextEdit" name="TextEdit">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -137,12 +179,18 @@
             <string>Paste from
 &amp;clipboard</string>
            </property>
+           <property name="icon">
+            <iconset theme="edit-paste"/>
+           </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="ResetTextPushButton">
            <property name="text">
-            <string>R&amp;eset text</string>
+            <string>R&amp;eset</string>
+           </property>
+           <property name="icon">
+            <iconset theme="edit-clear"/>
            </property>
           </widget>
          </item>
@@ -151,6 +199,9 @@
       </layout>
      </widget>
      <widget class="QWidget" name="FileTab">
+      <attribute name="icon">
+       <iconset theme="document-import"/>
+      </attribute>
       <attribute name="title">
        <string>Load &amp;from file</string>
       </attribute>
@@ -167,6 +218,9 @@
          <property name="text">
           <string>&amp;Choose a file</string>
          </property>
+         <property name="icon">
+          <iconset theme="document-open"/>
+         </property>
         </widget>
        </item>
        <item>
@@ -174,11 +228,17 @@
          <property name="text">
           <string>R&amp;eset</string>
          </property>
+         <property name="icon">
+          <iconset theme="edit-clear"/>
+         </property>
         </widget>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="URLTab">
+      <attribute name="icon">
+       <iconset theme="download"/>
+      </attribute>
       <attribute name="title">
        <string>Load from &amp;URL</string>
       </attribute>
@@ -198,12 +258,18 @@
          <property name="text">
           <string>Paste from &amp;clipboard</string>
          </property>
+         <property name="icon">
+          <iconset theme="edit-paste"/>
+         </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="ResetURLPushButton">
          <property name="text">
           <string>R&amp;eset</string>
+         </property>
+         <property name="icon">
+          <iconset theme="edit-clear"/>
          </property>
         </widget>
        </item>
@@ -219,7 +285,13 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
      <widget class="QWidget" name="MatchesTab">
+      <attribute name="icon">
+       <iconset theme="edit-find"/>
+      </attribute>
       <attribute name="title">
        <string>Fi&amp;nd matches</string>
       </attribute>
@@ -271,13 +343,20 @@
          <item>
           <widget class="QCheckBox" name="GroupsCheckBox">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="text">
             <string>Sho&amp;w matched groups</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="PositionsCheckBox">
+           <property name="text">
+            <string>Show po&amp;sitions</string>
            </property>
           </widget>
          </item>
@@ -316,6 +395,9 @@
            <property name="text">
             <string>Find &amp;matches</string>
            </property>
+           <property name="icon">
+            <iconset theme="edit-find"/>
+           </property>
            <property name="default">
             <bool>true</bool>
            </property>
@@ -326,6 +408,9 @@
            <property name="text">
             <string>Rese&amp;t results</string>
            </property>
+           <property name="icon">
+            <iconset theme="edit-clear"/>
+           </property>
           </widget>
          </item>
         </layout>
@@ -333,10 +418,30 @@
       </layout>
      </widget>
      <widget class="QWidget" name="ReplaceTab">
+      <attribute name="icon">
+       <iconset theme="edit-find-replace"/>
+      </attribute>
       <attribute name="title">
        <string>Search and &amp;replace</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QHBoxLayout" name="ReplacementTextLayout">
+         <item>
+          <widget class="QLabel" name="ReplacementTextLabel">
+           <property name="text">
+            <string>Replace&amp;ment text</string>
+           </property>
+           <property name="buddy">
+            <cstring>ReplacementTextLineEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="ReplacementTextLineEdit"/>
+         </item>
+        </layout>
+       </item>
        <item>
         <layout class="QHBoxLayout" name="ReplacementsLayout">
          <item>
@@ -375,10 +480,21 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QLabel" name="NumberOfReplacementsLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
-        <widget class="QTextBrowser" name="ReplacementsTextBrowser"/>
+        <widget class="QPlainTextEdit" name="ReplacementsPlainTextEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="ReplaceButtonsLayout">
@@ -403,6 +519,9 @@
            <property name="text">
             <string>&amp;Search and replace</string>
            </property>
+           <property name="icon">
+            <iconset theme="edit-find-replace"/>
+           </property>
            <property name="default">
             <bool>true</bool>
            </property>
@@ -413,6 +532,9 @@
            <property name="text">
             <string>Rese&amp;t results</string>
            </property>
+           <property name="icon">
+            <iconset theme="edit-clear"/>
+           </property>
           </widget>
          </item>
         </layout>
@@ -420,6 +542,9 @@
       </layout>
      </widget>
      <widget class="QWidget" name="SplitTab">
+      <attribute name="icon">
+       <iconset theme="edit-cut"/>
+      </attribute>
       <attribute name="title">
        <string>S&amp;plit text</string>
       </attribute>
@@ -431,12 +556,18 @@
            <property name="text">
             <string>Splits limit</string>
            </property>
+           <property name="buddy">
+            <cstring>SplitsLimitSpinBox</cstring>
+           </property>
           </widget>
          </item>
          <item>
           <widget class="QSpinBox" name="SplitsLimitSpinBox">
            <property name="enabled">
             <bool>false</bool>
+           </property>
+           <property name="minimum">
+            <number>1</number>
            </property>
           </widget>
          </item>
@@ -453,6 +584,13 @@
            </property>
            <property name="checked">
             <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="NumberOfSplitsLabel">
+           <property name="text">
+            <string/>
            </property>
           </widget>
          </item>
@@ -484,6 +622,9 @@
            <property name="text">
             <string>&amp;Split text</string>
            </property>
+           <property name="icon">
+            <iconset theme="edit-cut"/>
+           </property>
            <property name="default">
             <bool>true</bool>
            </property>
@@ -493,6 +634,9 @@
           <widget class="QPushButton" name="ResetSplitPushButton">
            <property name="text">
             <string>Rese&amp;t results</string>
+           </property>
+           <property name="icon">
+            <iconset theme="edit-clear"/>
            </property>
           </widget>
          </item>
@@ -506,7 +650,6 @@
  </widget>
  <tabstops>
   <tabstop>ResultsTabWidget</tabstop>
-  <tabstop>RegExpLineEdit</tabstop>
  </tabstops>
  <resources/>
  <connections/>

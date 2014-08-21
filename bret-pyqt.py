@@ -20,7 +20,7 @@
 
 __appName__ = 'BRET'
 __fullAppName__ = 'Basic Regular Expressions Tester'
-__version__ = '0.2'
+__version__ = '0.3'
 
 import sys
 import re
@@ -28,8 +28,8 @@ from urllib.request import urlopen, Request
 from urllib.error import URLError
 
 try :
-	from PyQt4.QtGui import QApplication, QWidget, QFileDialog, QMessageBox, QTextEdit, QStandardItem, QStandardItemModel
-	from PyQt4.QtCore import QObject, SIGNAL, Qt, QUrl
+	from PyQt4.QtGui import QApplication, QWidget, QFileDialog, QMessageBox, QTextEdit, QStandardItem, QStandardItemModel, QAbstractItemView
+	from PyQt4.QtCore import QObject, SIGNAL, Qt
 except ImportError :
 	print("FATAL ERROR : PyQt4 library can not be loaded !", "You can not use the GUI of BRET, try using bret script without GUI", sep='\n', file=sys.stderr)
 	sys.exit(1) # Fatal error.
@@ -41,16 +41,18 @@ except ImportError as e :
 	QMessageBox.critical(None, "FATAL ERROR", "<h3>"+e.msg.capitalize()+"</h3>" + "<p>"+_translate("Window", "Your copy of BRET may be broken", None)+"</p>")
 	sys.exit(1)
 
-class InvalidURLError(URLError):
-	def __init__(self, msg):
-		super().__init__(self, msg)
-
 class MainWindow(QWidget, Ui_Window):
 	def __init__(self, parent=None):
 		super().__init__(parent)
 		self.setupUi(self)
-		self.matchesModel = QStandardItemModel(self.MatchesTreeView) # Model to be used in the 'Search and replace' tree view.
+		self.matchesModel = QStandardItemModel(self.MatchesTreeView) # Model to be used in the 'Find matches' tree view.
 		self.MatchesTreeView.setModel(self.matchesModel)
+		self.MatchesTreeView.setEditTriggers(QAbstractItemView.NoEditTriggers) # Prevent editing.
+		self.MatchesTreeView.setSelectionMode(QAbstractItemView.ExtendedSelection) # Multiple selections allowed.
+		self.splitsModel = QStandardItemModel(self.SplitResultsListView) # Model to be used in the 'Split text' list view.
+		self.SplitResultsListView.setModel(self.splitsModel)
+		self.SplitResultsListView.setEditTriggers(QAbstractItemView.NoEditTriggers)
+		self.SplitResultsListView.setSelectionMode(QAbstractItemView.ExtendedSelection)
 		self.clipboard = QApplication.clipboard()
 		if self.clipboard.text() : # If the clipboard contains text data :
 			self.PasteTextPushButton.setEnabled(True) # Enable the 'Paste from clipboard' buttons.
@@ -69,9 +71,14 @@ class MainWindow(QWidget, Ui_Window):
 		QObject.connect(self.FilePathLineEdit, SIGNAL("textChanged(const QString&)"), self.lineEditChange) # Same for the file path edit.
 		QObject.connect(self.URLLineEdit, SIGNAL("textChanged(const QString&)"), self.lineEditChange) # Same for the URL edit.
 		QObject.connect(self.MethodTabWidget, SIGNAL("currentChanged(int)"), self.tabChange) # Same for the file path edit.
-		QObject.connect(self.FindMatchesPushButton, SIGNAL("clicked()"), self.searchAndReplace) # 'Search and replace button'
+		QObject.connect(self.FindMatchesPushButton, SIGNAL("clicked()"), self.findMatches) # 'Find matches' button.
 		QObject.connect(self.ResetMatchesPushButton, SIGNAL("clicked()"), self.matchesModel.clear) # Clear the results of the match.
 		QObject.connect(self.clipboard, SIGNAL("dataChanged()"), self.clipboardDataChanged) # Enable/disable the 'Paste from clipboard' buttons.
+		QObject.connect(self.ResetReplacementsPushButton, SIGNAL("clicked()"), self.resetSearchAndReplace) # Clear the the 'Search and replace' text area and the replacements count label. 
+		QObject.connect(self.ReplacePushButton, SIGNAL("clicked()"), self.searchAndReplace) # 'Search and replace' button.
+		QObject.connect(self.ResetSplitPushButton, SIGNAL("clicked()"), self.resetSplitText) # Clear the the 'Split text' list view and the splits count label. 
+		QObject.connect(self.SplitPushButton, SIGNAL("clicked()"), self.splitText) # 'Split text' button.
+		QObject.connect(self.ResetRegExpPushButton, SIGNAL("clicked()"), self.RegExpLineEdit.clear) # Reset RegExp button.
 
 	def clipboardDataChanged(self):
 		if self.clipboard.text() : # If the clipboard contains text data :
@@ -119,6 +126,17 @@ class MainWindow(QWidget, Ui_Window):
 		self.tabChange(0)
 	def lineEditChange(self, text):
 		self.tabChange(self.MethodTabWidget.currentIndex())
+		
+	def resetSearchAndReplace(self):
+		self.ReplacementsPlainTextEdit.setPlainText('')
+		self.NumberOfReplacementsLabel.clear()
+	def resetSplitText(self):
+		self.NumberOfSplitsLabel.clear()
+		self.splitsModel.clear()
+	def resetAll(self):
+		self.matchesModel.clear()
+		self.resetSearchAndReplace()
+		self.resetSplitText()
 	
 	def verifiedRegExp(self):
 		regexp = None
@@ -130,7 +148,6 @@ class MainWindow(QWidget, Ui_Window):
 			regexp = re.compile(self.RegExpLineEdit.text(), flags = ignoreCase | multiline | pointAll | ASCIIOnly)
 		except re.error as e: # Syntax errors in the RegExp.
 			QMessageBox.warning(self, _translate("Window", "Invalid regular expression", None), "<h3>"+_translate("Window", "The regular expression you entred is invalid !", None)+"</h3><p>"+_translate("Window", "Cause : "+str(e), None)+"</p>")
-			self.matchesModel.clear()
 			self.RegExpLineEdit.selectAll() # Select all the text in the RegExp line edit.
 		return regexp # The valid RegExp or None.
 	
@@ -159,26 +176,21 @@ class MainWindow(QWidget, Ui_Window):
 		url = self.URLLineEdit.text()
 		content = ""
 		try :
-			if not QUrl(url).isValid() :
-				raise InvalidURLError("The URL you entred is invalid")
-			else :
-				request = Request(url, headers={'User-Agent':__appName__+'/'+__version__})
-				response = urlopen(request)
-				content = response.read() # The content of the URL.
-				response.close()
+			request = Request(url, headers={'User-Agent':__appName__+'/'+__version__})
+			response = urlopen(request)
+			content = str(response.read(), encoding='utf-8') # The content of the URL.
+			response.close()
 		except UnicodeError :
 			QMessageBox.warning(self, _translate("Window", "Invalid downloaded file", None), "<h3>"+_translate("Window", "The file downloaded doesn't contain valid Unicode text !", None)+"</h3><p>"+_translate("Window", "Maybe because the URL doesn't point to a text file or it is corrupted", None)+"</p>")
-		except InvalidURLError :
-			QMessageBox.warning(self, _translate("Window", "Invalid URL", None), "<h3>"+_translate("Window", "The URL you entred is invalid !", None)+"</h3><p>"+_translate("Window", "Check the URL syntax", None)+"</p>")
 		except URLError as e :
-			QMessageBox.warning(self, _translate("Window", "URL error", None), "<h3>"+_translate("Window", "Error occurred when using the URL !", None)+"</h3><p>"+str(e.reason)+"</p>")
+			QMessageBox.warning(self, _translate("Window", "URL error", None), "<h3>"+_translate("Window", "Error occurred when using the URL !", None)+"</h3><p>Cause : "+str(e.reason)+"</p>")
 		finally :
 			return content
-
-	def searchAndReplace(self):
+	
+	def getRegExpAndText(self):
+		self.resetAll()
 		regexp = self.verifiedRegExp() 
-		if not regexp : return
-		self.matchesModel.clear()
+		if not regexp : return (None, None)
 		index = self.MethodTabWidget.currentIndex()
 		matches = None
 		content = ""
@@ -188,29 +200,53 @@ class MainWindow(QWidget, Ui_Window):
 			content = self.loadTextFile()
 		else :
 			content = self.loadURL()
-		if not content : return
+		if not content : return (None, None)
+		return (regexp, content)
+
+	def findMatches(self):
+		regexp, content = self.getRegExpAndText()
+		if not regexp : return # Or if not content : return
 		end = len(content)-1
-		matches = bret.search(regexp, content, 0 if self.NoMatchesLimitCheckBox.isChecked() else self.MatchesLimitSpinBox.value(), 0, end) 
-		self.matchesModel.setHorizontalHeaderLabels(['Match','From position','to position'])
+		matches = bret.search(regexp, content, 0 if self.NoMatchesLimitCheckBox.isChecked() else self.MatchesLimitSpinBox.value(), 0, end)
+		headers = ['Match','From position','to position'] if self.PositionsCheckBox.isChecked() else ['Match']
+		self.matchesModel.setHorizontalHeaderLabels(headers)
 		for m in matches :
 			item = QStandardItem(m.group())
-			item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-			startPositionItem = QStandardItem(str(m.start()))
-			startPositionItem.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-			endPositionItem = QStandardItem(str(m.end()))
-			endPositionItem.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-			self.matchesModel.appendRow([item, startPositionItem, endPositionItem])
+			if self.PositionsCheckBox.isChecked() :
+				startPositionItem = QStandardItem(str(m.start()))
+				endPositionItem = QStandardItem(str(m.end()))
+				self.matchesModel.appendRow([item, startPositionItem, endPositionItem])
+			else :
+				self.matchesModel.appendRow([item])
 			if self.GroupsCheckBox.isChecked() :
 				for i in range(len(m.groups())) :
 					subgroupItem = QStandardItem(m.group(i+1))
-					subgroupItem.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-					subgroupStartItem = QStandardItem(str(m.start(i+1)))
-					subgroupStartItem.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-					subgroupEndItem = QStandardItem(str(m.end(i+1)))
-					subgroupEndItem.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-					item.appendRow([subgroupItem, subgroupStartItem, subgroupEndItem])
-				self.MatchesTreeView.expandAll()
+					if self.PositionsCheckBox.isChecked() :
+						subgroupStartItem = QStandardItem(str(m.start(i+1)))
+						subgroupEndItem = QStandardItem(str(m.end(i+1)))
+						item.appendRow([subgroupItem, subgroupStartItem, subgroupEndItem])
+					else :
+						item.appendRow([subgroupItem])
+		self.MatchesTreeView.expandAll()
 		self.MatchesTreeView.resizeColumnToContents(0)
+		
+	def searchAndReplace(self):
+		regexp, content = self.getRegExpAndText()
+		if not regexp : return # Or if not content : return
+		end = len(content)-1
+		text, numberOfReplacements = bret.replace(regexp, content, 0 if self.NoReplacementsLimitCheckBox.isChecked() else self.ReplacementsLimitSpinBox.value(), 0, end, self.ReplacementTextLineEdit.text(), exact=False) 
+		self.NumberOfReplacementsLabel.setText('<i>' + _translate("Window", 'Number of replacements made :', None) + ' </i><b>' + str(numberOfReplacements) + '</b>')
+		self.ReplacementsPlainTextEdit.setPlainText(text)
+		
+	def splitText(self):
+		regexp, content = self.getRegExpAndText()
+		if not regexp : return # Or if not content : return
+		end = len(content)-1
+		strings = bret.split(regexp, content, 0 if self.NoSplitsLimitCheckBox.isChecked() else self.SplitsLimitSpinBox.value(), 0, end)
+		self.NumberOfSplitsLabel.setText('<i>' + _translate("Window", 'Number of splits made :', None) + ' </i><b>' + str(len(strings)-1) + '</b>')
+		for s in strings :
+			item = QStandardItem(s)
+			self.splitsModel.appendRow(item)
 
 window = MainWindow()
 window.show()

@@ -47,7 +47,7 @@ def search(regexp, text, limit, start, end):
 	return matches
 # Splitting function :
 def split(regexp, text, limit, start, end):
-	return regexp.split(text[:start]+text[start:end]+text[end:], limit)
+	return regexp.split(text[:start]+text[start:end]+text[end:], limit) # List of strings
 # If the script is running from the command line :
 if __name__  == '__main__' :
 	import sys
