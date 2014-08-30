@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'GUI/bret.ui'
 #
-# Created: Thu Aug 21 18:22:06 2014
+# Created: Sat Aug 30 22:21:31 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,10 @@ except AttributeError:
 class Ui_Window(object):
     def setupUi(self, Window):
         Window.setObjectName(_fromUtf8("Window"))
-        Window.resize(594, 561)
+        Window.resize(563, 561)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("BRET-512.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        Window.setWindowIcon(icon)
         self.verticalLayout_3 = QtGui.QVBoxLayout(Window)
         self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
         self.RegExpGroupBox = QtGui.QGroupBox(Window)
@@ -47,11 +50,6 @@ class Ui_Window(object):
         self.RegExpLineEdit = QtGui.QLineEdit(self.RegExpGroupBox)
         self.RegExpLineEdit.setObjectName(_fromUtf8("RegExpLineEdit"))
         self.RegExpLayout.addWidget(self.RegExpLineEdit)
-        self.ResetRegExpPushButton = QtGui.QPushButton(self.RegExpGroupBox)
-        icon = QtGui.QIcon.fromTheme(_fromUtf8("edit-clear"))
-        self.ResetRegExpPushButton.setIcon(icon)
-        self.ResetRegExpPushButton.setObjectName(_fromUtf8("ResetRegExpPushButton"))
-        self.RegExpLayout.addWidget(self.ResetRegExpPushButton)
         self.formLayout.setLayout(0, QtGui.QFormLayout.FieldRole, self.RegExpLayout)
         self.RegExpOptionsLabel = QtGui.QLabel(self.RegExpGroupBox)
         self.RegExpOptionsLabel.setObjectName(_fromUtf8("RegExpOptionsLabel"))
@@ -359,15 +357,18 @@ class Ui_Window(object):
         self.RegExpGroupBox.setTitle(_translate("Window", "Regular expresion and options", None))
         self.RegExpLabel.setText(_translate("Window", "Re&gular expression", None))
         self.RegExpLineEdit.setWhatsThis(_translate("Window", "Type here the regular expression in Python syntax", None))
-        self.ResetRegExpPushButton.setText(_translate("Window", "Reset", None))
         self.RegExpOptionsLabel.setText(_translate("Window", "Additional options", None))
-        self.IgnoreCasePushButton.setWhatsThis(_translate("Window", "<html><head/><body><p>Do not distinguish between lowercase and uppercase letters.</p><p>For example : the pattern [A-Z] will match lowercase letters too.</p></body></html>", None))
+        self.IgnoreCasePushButton.setToolTip(_translate("Window", "Do not distinguish between lowercase and uppercase letters.\n"
+"For example : the pattern [A-Z] will match lowercase letters too.", None))
         self.IgnoreCasePushButton.setText(_translate("Window", "&Ignore case", None))
-        self.MultiLinePushButton.setWhatsThis(_translate("Window", "<html><head/><body><p>Make the pattern character <span style=\" font-family:\'Courier New,courier\';\">\'^\'</span> matches at the beginning of the string and at the beginning of each line, and the pattern character <span style=\" font-family:\'Courier New,courier\';\">\'$\'</span> matches at the end of the string and at the end of each line.</p></body></html>", None))
+        self.MultiLinePushButton.setToolTip(_translate("Window", "Make the pattern character \'^\' matches at the beginning of the string and\n"
+"at the beginning of each line, and the pattern character \'$\' matches at the\n"
+"end of the string and at the end of each line.", None))
         self.MultiLinePushButton.setText(_translate("Window", "Multiline m&ode", None))
-        self.DotAllPushButton.setWhatsThis(_translate("Window", "<html><head/><body><p>Make the <span style=\" font-family:\'Courier New,courier\';\">\'.\'</span> special character match any character at all, including a newline.</p></body></html>", None))
+        self.DotAllPushButton.setToolTip(_translate("Window", "Make the \'.\' special character match any character at all, including a newline.", None))
         self.DotAllPushButton.setText(_translate("Window", "&Dot matches all", None))
-        self.ASCIIOnlyPushButton.setWhatsThis(_translate("Window", "<html><head/><body><p>Make <span style=\" font-family:\'Courier New,courier\';\">\\w</span>, <span style=\" font-family:\'Courier New,courier\';\">\\W</span>, <span style=\" font-family:\'Courier New,courier\';\">\\b</span>, <span style=\" font-family:\'Courier New,courier\';\">\\B</span>, <span style=\" font-family:\'Courier New,courier\';\">\\d</span>, <span style=\" font-family:\'Courier New,courier\';\">\\D</span>, <span style=\" font-family:\'Courier New,courier\';\">\\s</span> and <span style=\" font-family:\'Courier New,courier\';\">\\S</span> perform ASCII-only matching instead of full Unicode matching.</p></body></html>", None))
+        self.ASCIIOnlyPushButton.setToolTip(_translate("Window", "Make \\w, \\W, \\b, \\B, \\d, \\D, \\s and \\S perform ASCII-only\n"
+"matching instead of full Unicode matching.", None))
         self.ASCIIOnlyPushButton.setText(_translate("Window", "&ASCII only", None))
         self.PasteTextPushButton.setText(_translate("Window", "Paste from\n"
 "&clipboard", None))

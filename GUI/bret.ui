@@ -7,12 +7,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>594</width>
+    <width>563</width>
     <height>561</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Basic Regular Expression Tester</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>BRET-512.png</normaloff>BRET-512.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
@@ -49,16 +53,6 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QPushButton" name="ResetRegExpPushButton">
-          <property name="text">
-           <string>Reset</string>
-          </property>
-          <property name="icon">
-           <iconset theme="edit-clear"/>
-          </property>
-         </widget>
-        </item>
        </layout>
       </item>
       <item row="1" column="0">
@@ -72,8 +66,9 @@
        <layout class="QHBoxLayout" name="RegExpOptionsLayout">
         <item>
          <widget class="QPushButton" name="IgnoreCasePushButton">
-          <property name="whatsThis">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do not distinguish between lowercase and uppercase letters.&lt;/p&gt;&lt;p&gt;For example : the pattern [A-Z] will match lowercase letters too.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <property name="toolTip">
+           <string>Do not distinguish between lowercase and uppercase letters.
+For example : the pattern [A-Z] will match lowercase letters too.</string>
           </property>
           <property name="text">
            <string>&amp;Ignore case</string>
@@ -85,8 +80,10 @@
         </item>
         <item>
          <widget class="QPushButton" name="MultiLinePushButton">
-          <property name="whatsThis">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make the pattern character &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;'^'&lt;/span&gt; matches at the beginning of the string and at the beginning of each line, and the pattern character &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;'$'&lt;/span&gt; matches at the end of the string and at the end of each line.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <property name="toolTip">
+           <string>Make the pattern character '^' matches at the beginning of the string and
+at the beginning of each line, and the pattern character '$' matches at the
+end of the string and at the end of each line.</string>
           </property>
           <property name="text">
            <string>Multiline m&amp;ode</string>
@@ -98,8 +95,8 @@
         </item>
         <item>
          <widget class="QPushButton" name="DotAllPushButton">
-          <property name="whatsThis">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make the &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;'.'&lt;/span&gt; special character match any character at all, including a newline.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <property name="toolTip">
+           <string>Make the '.' special character match any character at all, including a newline.</string>
           </property>
           <property name="text">
            <string>&amp;Dot matches all</string>
@@ -111,8 +108,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="ASCIIOnlyPushButton">
-          <property name="whatsThis">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\w&lt;/span&gt;, &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\W&lt;/span&gt;, &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\b&lt;/span&gt;, &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\B&lt;/span&gt;, &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\d&lt;/span&gt;, &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\D&lt;/span&gt;, &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\s&lt;/span&gt; and &lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;\S&lt;/span&gt; perform ASCII-only matching instead of full Unicode matching.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <property name="toolTip">
+           <string>Make \w, \W, \b, \B, \d, \D, \s and \S perform ASCII-only
+matching instead of full Unicode matching.</string>
           </property>
           <property name="text">
            <string>&amp;ASCII only</string>
@@ -143,7 +141,9 @@
      </property>
      <widget class="QWidget" name="TextTab">
       <attribute name="icon">
-       <iconset theme="text-field"/>
+       <iconset theme="text-field">
+        <normaloff/>
+       </iconset>
       </attribute>
       <attribute name="title">
        <string>Input te&amp;xt</string>
@@ -180,7 +180,9 @@
 &amp;clipboard</string>
            </property>
            <property name="icon">
-            <iconset theme="edit-paste"/>
+            <iconset theme="edit-paste">
+             <normaloff/>
+            </iconset>
            </property>
           </widget>
          </item>
@@ -190,7 +192,9 @@
             <string>R&amp;eset</string>
            </property>
            <property name="icon">
-            <iconset theme="edit-clear"/>
+            <iconset theme="edit-clear">
+             <normaloff/>
+            </iconset>
            </property>
           </widget>
          </item>
@@ -200,7 +204,9 @@
      </widget>
      <widget class="QWidget" name="FileTab">
       <attribute name="icon">
-       <iconset theme="document-import"/>
+       <iconset theme="document-import">
+        <normaloff/>
+       </iconset>
       </attribute>
       <attribute name="title">
        <string>Load &amp;from file</string>
@@ -219,7 +225,9 @@
           <string>&amp;Choose a file</string>
          </property>
          <property name="icon">
-          <iconset theme="document-open"/>
+          <iconset theme="document-open">
+           <normaloff/>
+          </iconset>
          </property>
         </widget>
        </item>
@@ -229,7 +237,9 @@
           <string>R&amp;eset</string>
          </property>
          <property name="icon">
-          <iconset theme="edit-clear"/>
+          <iconset theme="edit-clear">
+           <normaloff/>
+          </iconset>
          </property>
         </widget>
        </item>
@@ -237,7 +247,9 @@
      </widget>
      <widget class="QWidget" name="URLTab">
       <attribute name="icon">
-       <iconset theme="download"/>
+       <iconset theme="download">
+        <normaloff/>
+       </iconset>
       </attribute>
       <attribute name="title">
        <string>Load from &amp;URL</string>
@@ -259,7 +271,9 @@
           <string>Paste from &amp;clipboard</string>
          </property>
          <property name="icon">
-          <iconset theme="edit-paste"/>
+          <iconset theme="edit-paste">
+           <normaloff/>
+          </iconset>
          </property>
         </widget>
        </item>
@@ -269,7 +283,9 @@
           <string>R&amp;eset</string>
          </property>
          <property name="icon">
-          <iconset theme="edit-clear"/>
+          <iconset theme="edit-clear">
+           <normaloff/>
+          </iconset>
          </property>
         </widget>
        </item>
@@ -290,7 +306,9 @@
      </property>
      <widget class="QWidget" name="MatchesTab">
       <attribute name="icon">
-       <iconset theme="edit-find"/>
+       <iconset theme="edit-find">
+        <normaloff/>
+       </iconset>
       </attribute>
       <attribute name="title">
        <string>Fi&amp;nd matches</string>
@@ -396,7 +414,9 @@
             <string>Find &amp;matches</string>
            </property>
            <property name="icon">
-            <iconset theme="edit-find"/>
+            <iconset theme="edit-find">
+             <normaloff/>
+            </iconset>
            </property>
            <property name="default">
             <bool>true</bool>
@@ -409,7 +429,9 @@
             <string>Rese&amp;t results</string>
            </property>
            <property name="icon">
-            <iconset theme="edit-clear"/>
+            <iconset theme="edit-clear">
+             <normaloff/>
+            </iconset>
            </property>
           </widget>
          </item>
@@ -419,7 +441,9 @@
      </widget>
      <widget class="QWidget" name="ReplaceTab">
       <attribute name="icon">
-       <iconset theme="edit-find-replace"/>
+       <iconset theme="edit-find-replace">
+        <normaloff/>
+       </iconset>
       </attribute>
       <attribute name="title">
        <string>Search and &amp;replace</string>
@@ -520,7 +544,9 @@
             <string>&amp;Search and replace</string>
            </property>
            <property name="icon">
-            <iconset theme="edit-find-replace"/>
+            <iconset theme="edit-find-replace">
+             <normaloff/>
+            </iconset>
            </property>
            <property name="default">
             <bool>true</bool>
@@ -533,7 +559,9 @@
             <string>Rese&amp;t results</string>
            </property>
            <property name="icon">
-            <iconset theme="edit-clear"/>
+            <iconset theme="edit-clear">
+             <normaloff/>
+            </iconset>
            </property>
           </widget>
          </item>
@@ -543,7 +571,9 @@
      </widget>
      <widget class="QWidget" name="SplitTab">
       <attribute name="icon">
-       <iconset theme="edit-cut"/>
+       <iconset theme="edit-cut">
+        <normaloff/>
+       </iconset>
       </attribute>
       <attribute name="title">
        <string>S&amp;plit text</string>
@@ -623,7 +653,9 @@
             <string>&amp;Split text</string>
            </property>
            <property name="icon">
-            <iconset theme="edit-cut"/>
+            <iconset theme="edit-cut">
+             <normaloff/>
+            </iconset>
            </property>
            <property name="default">
             <bool>true</bool>
@@ -636,7 +668,9 @@
             <string>Rese&amp;t results</string>
            </property>
            <property name="icon">
-            <iconset theme="edit-clear"/>
+            <iconset theme="edit-clear">
+             <normaloff/>
+            </iconset>
            </property>
           </widget>
          </item>

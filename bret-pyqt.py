@@ -28,7 +28,7 @@ from urllib.request import urlopen, Request
 from urllib.error import URLError
 
 try :
-	from PyQt4.QtGui import QApplication, QWidget, QFileDialog, QMessageBox, QTextEdit, QStandardItem, QStandardItemModel, QAbstractItemView
+	from PyQt4.QtGui import QApplication, QWidget, QFileDialog, QMessageBox, QTextEdit, QStandardItem, QStandardItemModel, QAbstractItemView, QIcon
 	from PyQt4.QtCore import QObject, SIGNAL, Qt
 except ImportError :
 	print("FATAL ERROR : PyQt4 library can not be loaded !", "You can not use the GUI of BRET, try using bret script without GUI", sep='\n', file=sys.stderr)
@@ -41,10 +41,11 @@ except ImportError as e :
 	QMessageBox.critical(None, "FATAL ERROR", "<h3>"+e.msg.capitalize()+"</h3>" + "<p>"+_translate("Window", "Your copy of BRET may be broken", None)+"</p>")
 	sys.exit(1)
 
-class MainWindow(QWidget, Ui_Window):
+class Window(QWidget, Ui_Window):
 	def __init__(self, parent=None):
 		super().__init__(parent)
 		self.setupUi(self)
+		self.setWindowIcon(QIcon('GUI/BRET-512.png'))
 		self.matchesModel = QStandardItemModel(self.MatchesTreeView) # Model to be used in the 'Find matches' tree view.
 		self.MatchesTreeView.setModel(self.matchesModel)
 		self.MatchesTreeView.setEditTriggers(QAbstractItemView.NoEditTriggers) # Prevent editing.
@@ -53,7 +54,7 @@ class MainWindow(QWidget, Ui_Window):
 		self.SplitResultsListView.setModel(self.splitsModel)
 		self.SplitResultsListView.setEditTriggers(QAbstractItemView.NoEditTriggers)
 		self.SplitResultsListView.setSelectionMode(QAbstractItemView.ExtendedSelection)
-		self.clipboard = QApplication.clipboard()
+		self.clipboard = QApplication.clipboard() # Reference to the system clipboard.
 		if self.clipboard.text() : # If the clipboard contains text data :
 			self.PasteTextPushButton.setEnabled(True) # Enable the 'Paste from clipboard' buttons.
 			self.PasteURLPushButton.setEnabled(True)
@@ -78,8 +79,9 @@ class MainWindow(QWidget, Ui_Window):
 		QObject.connect(self.ReplacePushButton, SIGNAL("clicked()"), self.searchAndReplace) # 'Search and replace' button.
 		QObject.connect(self.ResetSplitPushButton, SIGNAL("clicked()"), self.resetSplitText) # Clear the the 'Split text' list view and the splits count label. 
 		QObject.connect(self.SplitPushButton, SIGNAL("clicked()"), self.splitText) # 'Split text' button.
-		QObject.connect(self.ResetRegExpPushButton, SIGNAL("clicked()"), self.RegExpLineEdit.clear) # Reset RegExp button.
-
+		QObject.connect(self.MatchesTreeView, SIGNAL("doubleClicked (const QModelIndex&)"), self.copyItem) # Copy content of an item in the matches tree view.
+		QObject.connect(self.SplitResultsListView, SIGNAL("doubleClicked (const QModelIndex&)"), self.copyItem) # Copy content of an item in the splits list view.
+		
 	def clipboardDataChanged(self):
 		if self.clipboard.text() : # If the clipboard contains text data :
 			self.PasteTextPushButton.setEnabled(True) # Enable the 'Paste from clipboard' buttons.
@@ -88,22 +90,10 @@ class MainWindow(QWidget, Ui_Window):
 			self.PasteTextPushButton.setDisabled(True)
 			self.PasteURLPushButton.setDisabled(True)
 
-	def chooseFile(self):
-		# Show the file dialog :
-		filePath = ""
-		fileDialog = QFileDialog(self)
-		fileDialog.setAcceptMode(QFileDialog.AcceptOpen)
-		fileDialog.setFileMode(QFileDialog.ExistingFile)
-		fileDialog.setNameFilters([ _translate("Window", "Text files (*.txt)", None),
-									_translate("Window", "XML files (*.xml)", None),
-									_translate("Window", "HTML files (*.html)", None),
-									_translate("Window", "CSV files (*.csv)", None),
-									_translate("Window", "All files (*)", None)
-									])
-		if fileDialog.exec_():
-			filePath = fileDialog.selectedFiles()[0]
-		if filePath : # If the user clicked Open :
-			self.FilePathLineEdit.setText(filePath)
+	def chooseFile(self): # Open the file selection dialog and set the file path.
+		filepath = QFileDialog.getOpenFileName(self,  _translate("Window", 'Open a text file file', None), filter='Text files (*.txt);;All files (*)', options=QFileDialog.ReadOnly)
+		if filepath :
+			self.FilePathLineEdit.setText(filepath)
 
 	def tabChange(self, index):
 		if index == 0 : # 'Input text' tab.
@@ -138,7 +128,7 @@ class MainWindow(QWidget, Ui_Window):
 		self.resetSearchAndReplace()
 		self.resetSplitText()
 	
-	def verifiedRegExp(self):
+	def verifiedRegExp(self): # Return the valid RegExp or show an error message to the user.
 		regexp = None
 		try :
 			ignoreCase = re.IGNORECASE if self.IgnoreCasePushButton.isChecked() else 0
@@ -147,9 +137,10 @@ class MainWindow(QWidget, Ui_Window):
 			ASCIIOnly = re.ASCII if self.ASCIIOnlyPushButton.isChecked() else 0
 			regexp = re.compile(self.RegExpLineEdit.text(), flags = ignoreCase | multiline | pointAll | ASCIIOnly)
 		except re.error as e: # Syntax errors in the RegExp.
-			QMessageBox.warning(self, _translate("Window", "Invalid regular expression", None), "<h3>"+_translate("Window", "The regular expression you entred is invalid !", None)+"</h3><p>"+_translate("Window", "Cause : "+str(e), None)+"</p>")
 			self.RegExpLineEdit.selectAll() # Select all the text in the RegExp line edit.
-		return regexp # The valid RegExp or None.
+			QMessageBox.warning(self, _translate("Window", "Invalid regular expression", None), "<h3>"+_translate("Window", "The regular expression you entred is invalid !", None)+"</h3><p>"+_translate("Window", "Cause : "+str(e), None)+"</p>")
+		finally :
+			return regexp # The valid RegExp or None.
 	
 	def loadTextFile(self): # Try to open and read the file :
 		text = ''
@@ -167,8 +158,6 @@ class MainWindow(QWidget, Ui_Window):
 			QMessageBox.warning(self, _translate("Window", "Invalid file", None), "<h3>"+_translate("Window", "The file doesn't contain valid Unicode text !", None)+"</h3><p>"+_translate("Window", "Maybe because the selected file is not a text file or it is corrupted", None)+"</p>")
 		except OSError as e :
 			QMessageBox.warning(self, _translate("Window", "Failed to use the selected file", None), "<h3>"+_translate("Window", "Can not open the selected file !", None)+"</h3><p>"+e.strerror+"</p>")
-		#except Exception :
-			#QMessageBox.warning(self, _translate("Window", "Unknown error", None), "<h3>"+_translate("Window", "An error occurred", None)+"</h3><p>"+str(e)+"</p>")
 		finally :
 			return text # File content or empty.
 
@@ -180,9 +169,9 @@ class MainWindow(QWidget, Ui_Window):
 			response = urlopen(request)
 			content = str(response.read(), encoding='utf-8') # The content of the URL.
 			response.close()
-		except UnicodeError :
+		except UnicodeError : # Not a text file :
 			QMessageBox.warning(self, _translate("Window", "Invalid downloaded file", None), "<h3>"+_translate("Window", "The file downloaded doesn't contain valid Unicode text !", None)+"</h3><p>"+_translate("Window", "Maybe because the URL doesn't point to a text file or it is corrupted", None)+"</p>")
-		except URLError as e :
+		except URLError as e : # Invalid URL or a connection problem :
 			QMessageBox.warning(self, _translate("Window", "URL error", None), "<h3>"+_translate("Window", "Error occurred when using the URL !", None)+"</h3><p>Cause : "+str(e.reason)+"</p>")
 		finally :
 			return content
@@ -191,7 +180,7 @@ class MainWindow(QWidget, Ui_Window):
 		self.resetAll()
 		regexp = self.verifiedRegExp() 
 		if not regexp : return (None, None)
-		index = self.MethodTabWidget.currentIndex()
+		index = self.MethodTabWidget.currentIndex() # 0 : from text / 1 : from file / 2 : from URL.
 		matches = None
 		content = ""
 		if index == 0 :
@@ -206,12 +195,13 @@ class MainWindow(QWidget, Ui_Window):
 	def findMatches(self):
 		regexp, content = self.getRegExpAndText()
 		if not regexp : return # Or if not content : return
-		end = len(content)-1
+		end = len(content)
 		matches = bret.search(regexp, content, 0 if self.NoMatchesLimitCheckBox.isChecked() else self.MatchesLimitSpinBox.value(), 0, end)
 		headers = ['Match','From position','to position'] if self.PositionsCheckBox.isChecked() else ['Match']
 		self.matchesModel.setHorizontalHeaderLabels(headers)
 		for m in matches :
 			item = QStandardItem(m.group())
+			item.setToolTip(_translate("MatchesTreeView", "Double-click to copy", None))
 			if self.PositionsCheckBox.isChecked() :
 				startPositionItem = QStandardItem(str(m.start()))
 				endPositionItem = QStandardItem(str(m.end()))
@@ -221,6 +211,7 @@ class MainWindow(QWidget, Ui_Window):
 			if self.GroupsCheckBox.isChecked() :
 				for i in range(len(m.groups())) :
 					subgroupItem = QStandardItem(m.group(i+1))
+					subgroupItem.setToolTip(_translate("MatchesTreeView", "Double-click to copy", None))
 					if self.PositionsCheckBox.isChecked() :
 						subgroupStartItem = QStandardItem(str(m.start(i+1)))
 						subgroupEndItem = QStandardItem(str(m.end(i+1)))
@@ -233,7 +224,7 @@ class MainWindow(QWidget, Ui_Window):
 	def searchAndReplace(self):
 		regexp, content = self.getRegExpAndText()
 		if not regexp : return # Or if not content : return
-		end = len(content)-1
+		end = len(content)
 		text, numberOfReplacements = bret.replace(regexp, content, 0 if self.NoReplacementsLimitCheckBox.isChecked() else self.ReplacementsLimitSpinBox.value(), 0, end, self.ReplacementTextLineEdit.text(), exact=False) 
 		self.NumberOfReplacementsLabel.setText('<i>' + _translate("Window", 'Number of replacements made :', None) + ' </i><b>' + str(numberOfReplacements) + '</b>')
 		self.ReplacementsPlainTextEdit.setPlainText(text)
@@ -241,13 +232,17 @@ class MainWindow(QWidget, Ui_Window):
 	def splitText(self):
 		regexp, content = self.getRegExpAndText()
 		if not regexp : return # Or if not content : return
-		end = len(content)-1
+		end = len(content)
 		strings = bret.split(regexp, content, 0 if self.NoSplitsLimitCheckBox.isChecked() else self.SplitsLimitSpinBox.value(), 0, end)
 		self.NumberOfSplitsLabel.setText('<i>' + _translate("Window", 'Number of splits made :', None) + ' </i><b>' + str(len(strings)-1) + '</b>')
 		for s in strings :
 			item = QStandardItem(s)
+			item.setToolTip(_translate("SplitResultsListView", "Double-click to copy", None))
 			self.splitsModel.appendRow(item)
+	
+	def copyItem(self, modelIndex):
+		self.clipboard.setText(modelIndex.data())
 
-window = MainWindow()
+window = Window()
 window.show()
 sys.exit(app.exec_())
