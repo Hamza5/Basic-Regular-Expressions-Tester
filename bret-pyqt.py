@@ -20,32 +20,32 @@
 
 __appName__ = 'BRET'
 __fullAppName__ = 'Basic Regular Expressions Tester'
-__version__ = '0.3'
+__version__ = '0.4'
 
 import sys
 import re
-from urllib.request import urlopen, Request
+from urllib.request import urlretrieve
 from urllib.error import URLError
 
 try :
-	from PyQt4.QtGui import QApplication, QWidget, QFileDialog, QMessageBox, QTextEdit, QStandardItem, QStandardItemModel, QAbstractItemView, QIcon
+	from PyQt4.QtGui import QApplication, QWidget, QFileDialog, QMessageBox, QTextEdit, QStandardItem, QStandardItemModel, QAbstractItemView, QIcon, QMainWindow, QStatusBar
 	from PyQt4.QtCore import QObject, SIGNAL, Qt
 except ImportError :
 	print("FATAL ERROR : PyQt4 library can not be loaded !", "You can not use the GUI of BRET, try using bret script without GUI", sep='\n', file=sys.stderr)
 	sys.exit(1) # Fatal error.
 app = QApplication(sys.argv)
 try :
-	from GUI.bret_gui import Ui_Window, _translate
+	from GUI.bret_gui import Ui_CentralWidget, _translate
 	from script import bret
 except ImportError as e :
-	QMessageBox.critical(None, "FATAL ERROR", "<h3>"+e.msg.capitalize()+"</h3>" + "<p>"+_translate("Window", "Your copy of BRET may be broken", None)+"</p>")
+	QMessageBox.critical(None, "FATAL ERROR", "<h3>"+e.msg.capitalize()+"</h3>" + "<p>"+_translate("CentralWidget", "Your copy of BRET may be broken", None)+"</p>")
 	sys.exit(1)
 
-class Window(QWidget, Ui_Window):
+class CentralWidget(QWidget, Ui_CentralWidget):
 	def __init__(self, parent=None):
 		super().__init__(parent)
 		self.setupUi(self)
-		self.setWindowIcon(QIcon('GUI/BRET-512.png'))
+		self.DownloadProgressBar.hide()
 		self.matchesModel = QStandardItemModel(self.MatchesTreeView) # Model to be used in the 'Find matches' tree view.
 		self.MatchesTreeView.setModel(self.matchesModel)
 		self.MatchesTreeView.setEditTriggers(QAbstractItemView.NoEditTriggers) # Prevent editing.
@@ -58,6 +58,7 @@ class Window(QWidget, Ui_Window):
 		if self.clipboard.text() : # If the clipboard contains text data :
 			self.PasteTextPushButton.setEnabled(True) # Enable the 'Paste from clipboard' buttons.
 			self.PasteURLPushButton.setEnabled(True)
+		self.c = 0
 		QObject.connect(self.PasteTextPushButton, SIGNAL("clicked()"), self.TextEdit.paste) # Paste the text from the clipboard to the text edit.
 		QObject.connect(self.ResetTextPushButton, SIGNAL("clicked()"), self.TextEdit.clear) # Clear the text area when clicking on the 'Reset' button.
 		QObject.connect(self.FilePathPushButton, SIGNAL("clicked()"), self.chooseFile) # Open the file dialog when clicking on the 'Load from file' button.
@@ -91,7 +92,7 @@ class Window(QWidget, Ui_Window):
 			self.PasteURLPushButton.setDisabled(True)
 
 	def chooseFile(self): # Open the file selection dialog and set the file path.
-		filepath = QFileDialog.getOpenFileName(self,  _translate("Window", 'Open a text file file', None), filter='Text files (*.txt);;All files (*)', options=QFileDialog.ReadOnly)
+		filepath = QFileDialog.getOpenFileName(self,  _translate("CentralWidget", 'Open a text file file', None), filter='Text files (*.txt);;All files (*)', options=QFileDialog.ReadOnly)
 		if filepath :
 			self.FilePathLineEdit.setText(filepath)
 
@@ -138,7 +139,7 @@ class Window(QWidget, Ui_Window):
 			regexp = re.compile(self.RegExpLineEdit.text(), flags = ignoreCase | multiline | pointAll | ASCIIOnly)
 		except re.error as e: # Syntax errors in the RegExp.
 			self.RegExpLineEdit.selectAll() # Select all the text in the RegExp line edit.
-			QMessageBox.warning(self, _translate("Window", "Invalid regular expression", None), "<h3>"+_translate("Window", "The regular expression you entred is invalid !", None)+"</h3><p>"+_translate("Window", "Cause : "+str(e), None)+"</p>")
+			QMessageBox.warning(self, _translate("CentralWidget", "Invalid regular expression", None), "<h3>"+_translate("CentralWidget", "The regular expression you entred is invalid !", None)+"</h3><p>"+_translate("CentralWidget", "Cause : "+str(e), None)+"</p>")
 		finally :
 			return regexp # The valid RegExp or None.
 	
@@ -151,13 +152,13 @@ class Window(QWidget, Ui_Window):
 			textFile.close()
 		except FileNotFoundError :
 			# Show the error message dialog.
-			QMessageBox.warning(self, _translate("Window", "File not found", None), "<h3>"+_translate("Window", "The selected file can not be found !", None)+"</h3><p>"+_translate("Window", "Verify that the file exist", None)+"</p>")
+			QMessageBox.warning(self, _translate("CentralWidget", "File not found", None), "<h3>"+_translate("CentralWidget", "The selected file can not be found !", None)+"</h3><p>"+_translate("CentralWidget", "Verify that the file exist", None)+"</p>")
 		except PermissionError :
-			QMessageBox.warning(self, _translate("Window", "Permission error", None), "<h3>"+_translate("Window", "You don't have the required permissions to open this file !", None)+"</h3><p>"+_translate("Window", "It seems that the owner of this file didn't give you the permission of reading", None)+"</p>")
+			QMessageBox.warning(self, _translate("CentralWidget", "Permission error", None), "<h3>"+_translate("CentralWidget", "You don't have the required permissions to open this file !", None)+"</h3><p>"+_translate("CentralWidget", "It seems that the owner of this file didn't give you the permission of reading", None)+"</p>")
 		except UnicodeError :
-			QMessageBox.warning(self, _translate("Window", "Invalid file", None), "<h3>"+_translate("Window", "The file doesn't contain valid Unicode text !", None)+"</h3><p>"+_translate("Window", "Maybe because the selected file is not a text file or it is corrupted", None)+"</p>")
+			QMessageBox.warning(self, _translate("CentralWidget", "Invalid file", None), "<h3>"+_translate("CentralWidget", "The file doesn't contain valid Unicode text !", None)+"</h3><p>"+_translate("CentralWidget", "Maybe because the selected file is not a text file or it is corrupted", None)+"</p>")
 		except OSError as e :
-			QMessageBox.warning(self, _translate("Window", "Failed to use the selected file", None), "<h3>"+_translate("Window", "Can not open the selected file !", None)+"</h3><p>"+e.strerror+"</p>")
+			QMessageBox.warning(self, _translate("CentralWidget", "Failed to use the selected file", None), "<h3>"+_translate("CentralWidget", "Can not open the selected file !", None)+"</h3><p>"+e.strerror+"</p>")
 		finally :
 			return text # File content or empty.
 
@@ -165,16 +166,25 @@ class Window(QWidget, Ui_Window):
 		url = self.URLLineEdit.text()
 		content = ""
 		try :
-			request = Request(url, headers={'User-Agent':__appName__+'/'+__version__})
-			response = urlopen(request)
-			content = str(response.read(), encoding='utf-8') # The content of the URL.
-			response.close()
+			self.DownloadProgressBar.show()
+			filepath, headers = urlretrieve(url, reporthook=self.updateProgressBar)
+			file = open(filepath, encoding='utf-8')
+			content = file.read()
+			file.close()
 		except UnicodeError : # Not a text file :
-			QMessageBox.warning(self, _translate("Window", "Invalid downloaded file", None), "<h3>"+_translate("Window", "The file downloaded doesn't contain valid Unicode text !", None)+"</h3><p>"+_translate("Window", "Maybe because the URL doesn't point to a text file or it is corrupted", None)+"</p>")
+			QMessageBox.warning(self, _translate("CentralWidget", "Invalid downloaded file", None), "<h3>"+_translate("CentralWidget", "The file downloaded doesn't contain valid Unicode text !", None)+"</h3><p>"+_translate("CentralWidget", "Maybe because the URL doesn't point to a text file or the file is corrupted", None)+"</p>")
 		except URLError as e : # Invalid URL or a connection problem :
-			QMessageBox.warning(self, _translate("Window", "URL error", None), "<h3>"+_translate("Window", "Error occurred when using the URL !", None)+"</h3><p>Cause : "+str(e.reason)+"</p>")
+			QMessageBox.warning(self, _translate("CentralWidget", "URL error", None), "<h3>"+_translate("CentralWidget", "Error occurred when using the URL !", None)+"</h3><p>Cause : "+str(e.reason)+"</p>")
 		finally :
+			self.DownloadProgressBar.hide()
 			return content
+	
+	def updateProgressBar(self, chunk_number, chunk_size, total_size): # Used only as report hook function for loadURL.
+		if chunk_number == 0 :
+			self.DownloadProgressBar.setMaximum(total_size if total_size > 0 else 0)
+		value = (chunk_number + 1) * chunk_size
+		if value > total_size : value = total_size
+		self.DownloadProgressBar.setValue(value)
 	
 	def getRegExpAndText(self):
 		self.resetAll()
@@ -226,7 +236,7 @@ class Window(QWidget, Ui_Window):
 		if not regexp : return # Or if not content : return
 		end = len(content)
 		text, numberOfReplacements = bret.replace(regexp, content, 0 if self.NoReplacementsLimitCheckBox.isChecked() else self.ReplacementsLimitSpinBox.value(), 0, end, self.ReplacementTextLineEdit.text(), exact=False) 
-		self.NumberOfReplacementsLabel.setText('<i>' + _translate("Window", 'Number of replacements made :', None) + ' </i><b>' + str(numberOfReplacements) + '</b>')
+		self.NumberOfReplacementsLabel.setText('<i>' + _translate("CentralWidget", 'Number of replacements made :', None) + ' </i><b>' + str(numberOfReplacements) + '</b>')
 		self.ReplacementsPlainTextEdit.setPlainText(text)
 		
 	def splitText(self):
@@ -234,7 +244,7 @@ class Window(QWidget, Ui_Window):
 		if not regexp : return # Or if not content : return
 		end = len(content)
 		strings = bret.split(regexp, content, 0 if self.NoSplitsLimitCheckBox.isChecked() else self.SplitsLimitSpinBox.value(), 0, end)
-		self.NumberOfSplitsLabel.setText('<i>' + _translate("Window", 'Number of splits made :', None) + ' </i><b>' + str(len(strings)-1) + '</b>')
+		self.NumberOfSplitsLabel.setText('<i>' + _translate("CentralWidget", 'Number of splits made :', None) + ' </i><b>' + str(len(strings)-1) + '</b>')
 		for s in strings :
 			item = QStandardItem(s)
 			item.setToolTip(_translate("SplitResultsListView", "Double-click to copy", None))
@@ -242,7 +252,15 @@ class Window(QWidget, Ui_Window):
 	
 	def copyItem(self, modelIndex):
 		self.clipboard.setText(modelIndex.data())
+		
+class MainWindow(QMainWindow):
+	def __init__(self):
+		super().__init__(parent=None)
+		self.setWindowTitle(__fullAppName__)
+		self.setWindowIcon(QIcon('GUI/BRET-512.png'))
+		self.setCentralWidget(CentralWidget(self))
+		self.setStatusBar(QStatusBar(self))
 
-window = Window()
+window = MainWindow()
 window.show()
 sys.exit(app.exec_())

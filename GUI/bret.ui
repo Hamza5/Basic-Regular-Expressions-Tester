@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <author>Hamza Abbad</author>
- <class>Window</class>
- <widget class="QWidget" name="Window">
+ <class>CentralWidget</class>
+ <widget class="QWidget" name="CentralWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -70,6 +70,9 @@
            <string>Do not distinguish between lowercase and uppercase letters.
 For example : the pattern [A-Z] will match lowercase letters too.</string>
           </property>
+          <property name="statusTip">
+           <string>Click to select 'Ignore case' option</string>
+          </property>
           <property name="text">
            <string>&amp;Ignore case</string>
           </property>
@@ -85,6 +88,9 @@ For example : the pattern [A-Z] will match lowercase letters too.</string>
 at the beginning of each line, and the pattern character '$' matches at the
 end of the string and at the end of each line.</string>
           </property>
+          <property name="statusTip">
+           <string>Click to select 'Multiline mode' option</string>
+          </property>
           <property name="text">
            <string>Multiline m&amp;ode</string>
           </property>
@@ -97,6 +103,9 @@ end of the string and at the end of each line.</string>
          <widget class="QPushButton" name="DotAllPushButton">
           <property name="toolTip">
            <string>Make the '.' special character match any character at all, including a newline.</string>
+          </property>
+          <property name="statusTip">
+           <string>Click to select 'Dot matches all' option</string>
           </property>
           <property name="text">
            <string>&amp;Dot matches all</string>
@@ -111,6 +120,9 @@ end of the string and at the end of each line.</string>
           <property name="toolTip">
            <string>Make \w, \W, \b, \B, \d, \D, \s and \S perform ASCII-only
 matching instead of full Unicode matching.</string>
+          </property>
+          <property name="statusTip">
+           <string>Click to select 'ASCII only' option</string>
           </property>
           <property name="text">
            <string>&amp;ASCII only</string>
@@ -175,6 +187,9 @@ matching instead of full Unicode matching.</string>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="statusTip">
+            <string>Paste text from the clipboard</string>
+           </property>
            <property name="text">
             <string>Paste from
 &amp;clipboard</string>
@@ -188,6 +203,9 @@ matching instead of full Unicode matching.</string>
          </item>
          <item>
           <widget class="QPushButton" name="ResetTextPushButton">
+           <property name="statusTip">
+            <string>Clear the text</string>
+           </property>
            <property name="text">
             <string>R&amp;eset</string>
            </property>
@@ -221,6 +239,9 @@ matching instead of full Unicode matching.</string>
        </item>
        <item>
         <widget class="QPushButton" name="FilePathPushButton">
+         <property name="statusTip">
+          <string>Select a file</string>
+         </property>
          <property name="text">
           <string>&amp;Choose a file</string>
          </property>
@@ -233,6 +254,9 @@ matching instead of full Unicode matching.</string>
        </item>
        <item>
         <widget class="QPushButton" name="ResetFilePathPushButton">
+         <property name="statusTip">
+          <string>Clear the file path</string>
+         </property>
          <property name="text">
           <string>R&amp;eset</string>
          </property>
@@ -254,38 +278,58 @@ matching instead of full Unicode matching.</string>
       <attribute name="title">
        <string>Load from &amp;URL</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <widget class="QLineEdit" name="URLLineEdit">
-         <property name="placeholderText">
-          <string>URL</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="URLLayout">
+         <item>
+          <widget class="QLineEdit" name="URLLineEdit">
+           <property name="placeholderText">
+            <string>URL</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="PasteURLPushButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="statusTip">
+            <string>Past URL from the clipboard</string>
+           </property>
+           <property name="text">
+            <string>Paste from &amp;clipboard</string>
+           </property>
+           <property name="icon">
+            <iconset theme="edit-paste">
+             <normaloff/>
+            </iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="ResetURLPushButton">
+           <property name="statusTip">
+            <string>Clear the URL</string>
+           </property>
+           <property name="text">
+            <string>R&amp;eset</string>
+           </property>
+           <property name="icon">
+            <iconset theme="edit-clear">
+             <normaloff/>
+            </iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
-        <widget class="QPushButton" name="PasteURLPushButton">
-         <property name="enabled">
-          <bool>false</bool>
+        <widget class="QProgressBar" name="DownloadProgressBar">
+         <property name="value">
+          <number>0</number>
          </property>
-         <property name="text">
-          <string>Paste from &amp;clipboard</string>
-         </property>
-         <property name="icon">
-          <iconset theme="edit-paste">
-           <normaloff/>
-          </iconset>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="ResetURLPushButton">
-         <property name="text">
-          <string>R&amp;eset</string>
-         </property>
-         <property name="icon">
-          <iconset theme="edit-clear">
-           <normaloff/>
-          </iconset>
+         <property name="format">
+          <string>Downloading %v/%m bytes (%p%)</string>
          </property>
         </widget>
        </item>
@@ -337,6 +381,9 @@ matching instead of full Unicode matching.</string>
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="statusTip">
+            <string>Set the maximum number of results</string>
+           </property>
            <property name="minimum">
             <number>1</number>
            </property>
@@ -349,6 +396,9 @@ matching instead of full Unicode matching.</string>
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="statusTip">
+            <string>Ignore the limit of the results</string>
            </property>
            <property name="text">
             <string>No &amp;limit</string>
@@ -366,6 +416,9 @@ matching instead of full Unicode matching.</string>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="statusTip">
+            <string>Display also what was matched by parentheses</string>
+           </property>
            <property name="text">
             <string>Sho&amp;w matched groups</string>
            </property>
@@ -373,6 +426,9 @@ matching instead of full Unicode matching.</string>
          </item>
          <item>
           <widget class="QCheckBox" name="PositionsCheckBox">
+           <property name="statusTip">
+            <string>Display the beginning and ending positions where each match was found</string>
+           </property>
            <property name="text">
             <string>Show po&amp;sitions</string>
            </property>
@@ -462,7 +518,11 @@ matching instead of full Unicode matching.</string>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="ReplacementTextLineEdit"/>
+          <widget class="QLineEdit" name="ReplacementTextLineEdit">
+           <property name="statusTip">
+            <string>Text to be inserted where a match was found</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -483,6 +543,9 @@ matching instead of full Unicode matching.</string>
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="statusTip">
+            <string>Set the maximum number of replacements</string>
+           </property>
            <property name="minimum">
             <number>1</number>
            </property>
@@ -495,6 +558,9 @@ matching instead of full Unicode matching.</string>
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="statusTip">
+            <string>Ignore the limit of the replacements</string>
            </property>
            <property name="text">
             <string>No &amp;limit</string>
@@ -596,6 +662,9 @@ matching instead of full Unicode matching.</string>
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="statusTip">
+            <string>Set the maximum number of splits</string>
+           </property>
            <property name="minimum">
             <number>1</number>
            </property>
@@ -608,6 +677,9 @@ matching instead of full Unicode matching.</string>
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="statusTip">
+            <string>Ignore the limit of the splits</string>
            </property>
            <property name="text">
             <string>No &amp;limit</string>
