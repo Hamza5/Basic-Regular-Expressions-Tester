@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'GUI/bret.ui'
 #
-# Created: Sun Sep  7 19:02:25 2014
+# Created: Sat Sep 13 22:26:45 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -404,12 +404,15 @@ class Ui_CentralWidget(object):
         self.MatchesLimitSpinBox.setStatusTip(_translate("CentralWidget", "Set the maximum number of results", None))
         self.NoMatchesLimitCheckBox.setStatusTip(_translate("CentralWidget", "Ignore the limit of the results", None))
         self.NoMatchesLimitCheckBox.setText(_translate("CentralWidget", "No &limit", None))
+        self.GroupsCheckBox.setStatusTip(_translate("CentralWidget", "Display also what was matched by parentheses", None))
         self.GroupsCheckBox.setText(_translate("CentralWidget", "Sho&w matched groups", None))
+        self.PositionsCheckBox.setStatusTip(_translate("CentralWidget", "Display the beginning and ending positions where each match was found", None))
         self.PositionsCheckBox.setText(_translate("CentralWidget", "Show po&sitions", None))
         self.FindMatchesPushButton.setText(_translate("CentralWidget", "Find &matches", None))
         self.ResetMatchesPushButton.setText(_translate("CentralWidget", "Rese&t results", None))
         self.ResultsTabWidget.setTabText(self.ResultsTabWidget.indexOf(self.MatchesTab), _translate("CentralWidget", "Fi&nd matches", None))
         self.ReplacementTextLabel.setText(_translate("CentralWidget", "Replace&ment text", None))
+        self.ReplacementTextLineEdit.setStatusTip(_translate("CentralWidget", "Text to be inserted where a match was found", None))
         self.ReplacementsLimitLabel.setText(_translate("CentralWidget", "Replacements limit", None))
         self.ReplacementsLimitSpinBox.setStatusTip(_translate("CentralWidget", "Set the maximum number of replacements", None))
         self.NoReplacementsLimitCheckBox.setStatusTip(_translate("CentralWidget", "Ignore the limit of the replacements", None))
