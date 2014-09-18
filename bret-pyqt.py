@@ -38,7 +38,7 @@ try :
 	from GUI.bret_gui import Ui_CentralWidget, _translate
 	from script import bret
 except ImportError as e :
-	QMessageBox.critical(None, "FATAL ERROR", "<h3>"+e.msg.capitalize()+"</h3>" + "<p>"+_translate("CentralWidget", "Your copy of BRET may be broken", None)+"</p>")
+	QMessageBox.critical(None, "FATAL ERROR", "<h3>"+e.msg.capitalize()+"</h3>" + "<p>Your copy of BRET may be broken</p>")
 	sys.exit(1)
 
 class CentralWidget(QWidget, Ui_CentralWidget):
@@ -262,7 +262,7 @@ class MainWindow(QMainWindow):
 	def __init__(self):
 		super().__init__(parent=None)
 		self.setWindowTitle(__fullAppName__)
-		self.setWindowIcon(QIcon('GUI/BRET-512.png'))
+		self.setWindowIcon(QIcon('GUI/BRET-128.png'))
 		self.setCentralWidget(CentralWidget(self))
 		self.setStatusBar(QStatusBar(self))
 
