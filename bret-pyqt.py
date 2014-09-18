@@ -74,7 +74,7 @@ class CentralWidget(QWidget, Ui_CentralWidget):
 		QObject.connect(self.URLLineEdit, SIGNAL("textChanged(const QString&)"), self.lineEditChange) # Same for the URL edit.
 		QObject.connect(self.MethodTabWidget, SIGNAL("currentChanged(int)"), self.tabChange) # Same for the file path edit.
 		QObject.connect(self.FindMatchesPushButton, SIGNAL("clicked()"), self.findMatches) # 'Find matches' button.
-		QObject.connect(self.ResetMatchesPushButton, SIGNAL("clicked()"), self.matchesModel.clear) # Clear the results of the match.
+		QObject.connect(self.ResetMatchesPushButton, SIGNAL("clicked()"), self.resetMatches) # Clear the results of the match.
 		QObject.connect(self.clipboard, SIGNAL("dataChanged()"), self.clipboardDataChanged) # Enable/disable the 'Paste from clipboard' buttons.
 		QObject.connect(self.ResetReplacementsPushButton, SIGNAL("clicked()"), self.resetSearchAndReplace) # Clear the the 'Search and replace' text area and the replacements count label. 
 		QObject.connect(self.ReplacePushButton, SIGNAL("clicked()"), self.searchAndReplace) # 'Search and replace' button.
@@ -118,6 +118,9 @@ class CentralWidget(QWidget, Ui_CentralWidget):
 	def lineEditChange(self, text):
 		self.tabChange(self.MethodTabWidget.currentIndex())
 		
+	def resetMatches(self):
+		self.NumberOfResultsLabel.clear()
+		self.matchesModel.clear()
 	def resetSearchAndReplace(self):
 		self.ReplacementsPlainTextEdit.setPlainText('')
 		self.NumberOfReplacementsLabel.clear()
@@ -125,7 +128,7 @@ class CentralWidget(QWidget, Ui_CentralWidget):
 		self.NumberOfSplitsLabel.clear()
 		self.splitsModel.clear()
 	def resetAll(self):
-		self.matchesModel.clear()
+		self.resetMatches()
 		self.resetSearchAndReplace()
 		self.resetSplitText()
 	
@@ -207,7 +210,7 @@ class CentralWidget(QWidget, Ui_CentralWidget):
 		if not regexp : return # Or if not content : return
 		end = len(content)
 		matches = bret.search(regexp, content, 0 if self.NoMatchesLimitCheckBox.isChecked() else self.MatchesLimitSpinBox.value(), 0, end)
-		headers = ['Match','From position','to position'] if self.PositionsCheckBox.isChecked() else ['Match']
+		headers = [_translate("MatchesTreeView", 'Match', None), _translate("MatchesTreeView", 'From position', None), _translate("MatchesTreeView", 'to position', None)] if self.PositionsCheckBox.isChecked() else [_translate("MatchesTreeView", 'Match', None)]
 		self.matchesModel.setHorizontalHeaderLabels(headers)
 		for m in matches :
 			item = QStandardItem(m.group())
@@ -228,6 +231,8 @@ class CentralWidget(QWidget, Ui_CentralWidget):
 						item.appendRow([subgroupItem, subgroupStartItem, subgroupEndItem])
 					else :
 						item.appendRow([subgroupItem])
+		numberOfResults = len(matches)
+		self.NumberOfResultsLabel.setText('<i>' + _translate("CentralWidget", 'Number of results returned :', None) + ' </i><b>' + str(numberOfResults) + '</b>')
 		self.MatchesTreeView.expandAll()
 		self.MatchesTreeView.resizeColumnToContents(0)
 		

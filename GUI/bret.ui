@@ -449,6 +449,13 @@ matching instead of full Unicode matching.</string>
        <item>
         <layout class="QHBoxLayout" name="MatchesButtonsLayout">
          <item>
+          <widget class="QLabel" name="NumberOfResultsLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -570,13 +577,6 @@ matching instead of full Unicode matching.</string>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QLabel" name="NumberOfReplacementsLabel">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
        <item>
@@ -588,6 +588,13 @@ matching instead of full Unicode matching.</string>
        </item>
        <item>
         <layout class="QHBoxLayout" name="ReplaceButtonsLayout">
+         <item>
+          <widget class="QLabel" name="NumberOfReplacementsLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
          <item>
           <spacer name="horizontalSpacer_2">
            <property name="orientation">
@@ -689,13 +696,6 @@ matching instead of full Unicode matching.</string>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QLabel" name="NumberOfSplitsLabel">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
        <item>
@@ -703,6 +703,13 @@ matching instead of full Unicode matching.</string>
        </item>
        <item>
         <layout class="QHBoxLayout" name="SplitButtonsLayout">
+         <item>
+          <widget class="QLabel" name="NumberOfSplitsLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
          <item>
           <spacer name="horizontalSpacer_3">
            <property name="orientation">

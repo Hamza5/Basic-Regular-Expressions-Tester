@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'GUI/bret.ui'
 #
-# Created: Sat Sep 13 22:26:45 2014
+# Created: Thu Sep 18 22:16:21 2014
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -220,6 +220,10 @@ class Ui_CentralWidget(object):
         self.verticalLayout.addWidget(self.MatchesTreeView)
         self.MatchesButtonsLayout = QtGui.QHBoxLayout()
         self.MatchesButtonsLayout.setObjectName(_fromUtf8("MatchesButtonsLayout"))
+        self.NumberOfResultsLabel = QtGui.QLabel(self.MatchesTab)
+        self.NumberOfResultsLabel.setText(_fromUtf8(""))
+        self.NumberOfResultsLabel.setObjectName(_fromUtf8("NumberOfResultsLabel"))
+        self.MatchesButtonsLayout.addWidget(self.NumberOfResultsLabel)
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.MatchesButtonsLayout.addItem(spacerItem)
         self.FindMatchesPushButton = QtGui.QPushButton(self.MatchesTab)
