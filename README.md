@@ -25,4 +25,4 @@ The GUI program is `bret-pyqt.py`.
 ### License
 The bret script is licensed under [GNU Lesser General Public License 3](http://www.gnu.org/licenses/lgpl-3.0.html) or any later version.
 
-The GUI program is under [GNU General Public License 3](http://www.gnu.org/licenses/gpl.html) or any later version.
+The GUI program is licensed under [GNU General Public License 3](http://www.gnu.org/licenses/gpl.html) or any later version.
