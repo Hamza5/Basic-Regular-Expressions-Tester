@@ -26,6 +26,7 @@ import sys
 import re
 from urllib.request import urlretrieve
 from urllib.error import URLError
+from os.path import join
 
 try :
 	from PyQt4.QtGui import QApplication, QWidget, QFileDialog, QMessageBox, QTextEdit, QStandardItem, QStandardItemModel, QAbstractItemView, QIcon, QMainWindow, QStatusBar
@@ -262,7 +263,7 @@ class MainWindow(QMainWindow):
 	def __init__(self):
 		super().__init__(parent=None)
 		self.setWindowTitle(__fullAppName__)
-		self.setWindowIcon(QIcon('GUI/BRET-128.png'))
+		self.setWindowIcon(QIcon(join('GUI','BRET-128.png')))
 		self.setCentralWidget(CentralWidget(self))
 		self.setStatusBar(QStatusBar(self))
 
